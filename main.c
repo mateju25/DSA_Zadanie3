@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*---------------------------------------------------------------------------------------------*/
+//region Halda
+
 typedef struct vertex {
     int val;
     int indexInHeap;
@@ -13,22 +16,6 @@ typedef struct heap {
     int size;
     VERTEX** arrOfVer;
 }MIN_HEAP;
-
-typedef struct edge {
-    int val;
-    int* line;
-}EDGE;
-
-typedef struct node {
-    int x, y;
-    int seen;
-    int val;
-    struct node* before;
-    EDGE* edges[7];
-}NODE;
-
-/*---------------------------------------------------------------------------------------------*/
-//region Halda
 
 //vytvori minimal heap
 MIN_HEAP* createHeap() {
@@ -99,6 +86,7 @@ VERTEX* popFromHeap(MIN_HEAP** root) {
 /*---------------------------------------------------------------------------------------------*/
 //region Dijkstra
 
+
 //vlozi alebo updatne vrchol v halde
 void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
     if (mapa[(*paTemp)->y][(*paTemp)->x] == 'H') {
@@ -136,20 +124,15 @@ int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
     }
     return result;
 }
-//najde cestu od pociatku do ciela (ak je ciel nedostupny vrati najblizsiu cestu)
-int* findRoute(VERTEX* mapOfV[100][100], char **mapa, int n, int m, int t, int *dlzka_cesty, int paFinX, int paFinY, int paStaX, int paStaY) {
+//ohodnoti celu mapu z daneho bodu
+void setMap(VERTEX* mapOfV[100][100], char **mapa, int n, int m, int paStaX, int paStaY) {
     MIN_HEAP* heap = NULL;
     VERTEX* temp = mapOfV[paStaX][paStaY];
     temp->val = 0;
     insertHeap(&heap, temp);
-    VERTEX* best = NULL;
     while (heap->size >= 2) {
         VERTEX* temp = popFromHeap(&heap);
         mapOfV[temp->y][temp->x]->seen = 1;
-        if ((temp->x == paFinX) && (temp->y == paFinY))
-        {
-            return createRoute(temp, dlzka_cesty);
-        }
         if ( (temp->x+1 < m) &&(mapOfV[temp->y][temp->x+1]->seen == 0) && (mapa[temp->y][temp->x+1] != 'N')) {
             VERTEX* new = mapOfV[temp->y][temp->x+1];
             relax(mapa, &heap, &new, &temp);
@@ -166,16 +149,27 @@ int* findRoute(VERTEX* mapOfV[100][100], char **mapa, int n, int m, int t, int *
             VERTEX* new = mapOfV[temp->y-1][temp->x];
             relax(mapa, &heap, &new, &temp);
         }
-            if ((best == NULL) || (abs(paFinX - best->x) + abs(paFinY - best->y) > abs(paFinX - temp->x) +  abs(paFinY - temp->y)))
-                best = temp;
-    }
-    if (best != NULL)
-    {
-        return createRoute(best, dlzka_cesty);
     }
 }
 //endregion
 /*---------------------------------------------------------------------------------------------*/
+
+
+
+typedef struct edge {
+    int val;
+    int* line;
+}EDGE;
+
+typedef struct node {
+    int x, y;
+    EDGE* edges[7];
+}NODE;
+
+typedef struct bestRoute {
+    int val;
+    int* path;
+}BEST_ROUTE;
 
 void initializeMap(VERTEX* mapOfV[100][100], int n, int m) {
     for (int j = 0; j < n; j++) {
@@ -190,12 +184,58 @@ void initializeMap(VERTEX* mapOfV[100][100], int n, int m) {
     }
 }
 
+void WriteArr(NODE* paPoints[7], BEST_ROUTE* paBest, int* paArr, int* paN){
+    int val = 0;
+    for (int i = 0; i < *paN - 1; i++){
+        val += paPoints[paArr[i]]->edges[paArr[i+1]]->val;
+    }
+    if (val < paBest->val) {
+        paBest->val = val;
+        for (int i = 0; i < *paN; i++){
+            paBest->path[i] = paArr[i];
+        }
+    }
+
+}
+
+EDGE* mergePaths(EDGE* paFirst, EDGE* paSecond) {
+    EDGE* temp = malloc(sizeof(EDGE));
+    temp->line = malloc((paFirst->val + paSecond->val-1)*2*sizeof(int));
+    temp->val = paFirst->val + paSecond->val-1;
+    int i = 0;
+    for (i = 0; i < paFirst->val*2-2; i++) {
+        temp->line[i] = paFirst->line[i];
+    }
+    for (i = 0; i < paSecond->val*2; i++) {
+        temp->line[paFirst->val*2-2 + i] = paSecond->line[i];
+    }
+    return temp;
+}
+
+void Generate(NODE* paPoints[7], BEST_ROUTE* paBest, int* paArr, int* paN, int* nam){
+    for (int i = 1; i <= *paN; i++){
+        if (*paN != 1){
+            (*paN)--;
+            Generate(paPoints, paBest, paArr, paN, nam);
+            (*paN)++;
+            if (*paN != i){
+                for (int j = 0; j <= (*paN / 2 + *paN % 2)-1; j++){
+                    if (j != *paN - j - 1){
+                        int help = paArr[j];
+                        paArr[j] = paArr[*paN - j - 1];
+                        paArr[*paN - j - 1] = help;
+                    }
+                }
+            }
+        }
+        else WriteArr(paPoints, paBest, paArr, nam);
+    }
+}
+
 int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
-    int* path = NULL;
-    int* pathToDragon = NULL;
-    int* finalPath = NULL;
-    int currentSize;
-    NODE* points[8];
+    EDGE* pathToDragon = malloc(sizeof(EDGE));
+    pathToDragon->line = malloc(sizeof(int));
+    NODE* points[7];
     int akt = 0;
     int dragonX = 0, dragonY = 0;
 
@@ -205,59 +245,62 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
             mapOfV[j][i] = (VERTEX*)malloc(sizeof(VERTEX));
         }
     }
-    initializeMap(&mapOfV, n, m);
-
+    initializeMap(mapOfV, n, m);
+    setMap(mapOfV, mapa, n, m, 0, 0);
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             if (mapa[j][i] == 'D') {
                 dragonX = i;
                 dragonY = j;
-                pathToDragon = findRoute(&mapOfV, mapa, n, m, t, dlzka_cesty, i, j, 0, 0);
+                pathToDragon->line = createRoute(mapOfV[dragonY][dragonX], dlzka_cesty);
+                pathToDragon->val = *dlzka_cesty;
             }
             if (mapa[j][i] == 'P') {
                 points[akt]= (NODE*) malloc(sizeof(NODE));
-                points[akt]->x = i;
-                points[akt]->y = j;
-                points[akt]->val = 100000;
-                points[akt]->before = NULL;
+                points[akt]->x = j;
+                points[akt]->y = i;
                 akt++;
             }
         }
     }
     points[akt]= (NODE*) malloc(sizeof(NODE));
-    points[akt]->x = dragonX;
-    points[akt]->y = dragonY;
-    points[akt]->before = NULL;
-    points[akt]->val = *dlzka_cesty;
+    points[akt]->x = dragonY;
+    points[akt]->y = dragonX;
     akt++;
     points[akt]=NULL;
-    /*for (int i = 0; i < akt; i++) {
+    for (int i = 0; i < akt; i++) {
         if (points[i] == NULL) break;
+        initializeMap(mapOfV, n, m);
+        setMap(mapOfV, mapa, n, m, points[i]->x, points[i]->y);
         for (int j = 0; j < akt; j++) {
             points[i]->edges[j] = NULL;
             if (points[i] != points[j]) {
                 points[i]->edges[j] = (EDGE*)malloc(sizeof(EDGE));
-                points[i]->edges[j]->line = NULL;
-                points[i]->edges[j]->line = findRoute(mapa, n, m, t, dlzka_cesty, points[j]->x, points[j]->y, points[i]->x, points[i]->y);
+                points[i]->edges[j]->line = createRoute(mapOfV[points[j]->x][points[j]->y], dlzka_cesty);
                 points[i]->edges[j]->val = *dlzka_cesty;
             }
         }
         points[i]->edges[akt] = NULL;
     }
 
-    for (int i = akt; i >= 0; i--) {
-        if (points[i] == NULL) continue;
-        for (int j = 0; j < akt; j++) {
-            if (points[i]->edges[j] == NULL) continue;
-            if (points[j]->val > points[i]->edges[j]->val + points[i]->val) {
-                if ((points[j]->x == dragonX) && (points[j]->y == dragonY)) continue;
-                points[j]->val = points[i]->edges[j]->val + points[i]->val;
-                points[j]->before = points[i];
-            }
-        }
-    }*/
+    int* arr = malloc(akt*sizeof(int));
+    for (int i = 0; i < akt; i++){
+        arr[i] = i;
+    }
+    int* num;
+    num = malloc(sizeof(int));
+    *num = akt;
+    BEST_ROUTE* best = malloc(sizeof(BEST_ROUTE));
+    best->val = 10000;
+    best->path = (int*) malloc(akt*sizeof(int));
+    Generate(points, best, arr, num, &akt);
 
-    return pathToDragon;
+    for (int i = akt-1; i > 0; i--) {
+        pathToDragon = mergePaths(pathToDragon, points[best->path[i]]->edges[best->path[i-1]]);
+    }
+
+    *dlzka_cesty = pathToDragon->val;
+    return pathToDragon->line;
 }
 
 int main()
@@ -298,15 +341,15 @@ int main()
                 t = 12;
                 mapa = (char**)malloc(n*sizeof(char*));
                 mapa[0]="CCHCNHCCHN";
-                mapa[1]="NNCHHHHCCC";
-                mapa[2]="CNCCNNHHHC";
+                mapa[1]="NNCCCHHCCC";
+                mapa[2]="DNCCNNHHHC";
                 mapa[3]="CHHHCCCCCC";
-                mapa[4]="CCCCCNHCHH";
-                mapa[5]="CCHCCCNNNN";
+                mapa[4]="CCCCCNHHHH";
+                mapa[5]="PCHCCCNNNN";
                 mapa[6]="NNNNNHCCCC";
-                mapa[7]="CCCCCCCCCC";
-                mapa[8]="CCCNNHHHCC";
-                mapa[9]="HHCCCCCCCD";
+                mapa[7]="CCCCCPCCCC";
+                mapa[8]="CCCNNHHHHH";
+                mapa[9]="HHHPCCCCCC";
                 cesta = zachran_princezne(mapa, n, m, t, &dlzka_cesty);
                 break;
             case 3: //pridajte vlastne testovacie vzorky

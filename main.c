@@ -21,7 +21,7 @@ typedef struct heap {
 //vytvori minimal heap
 MIN_HEAP* createHeap() {
     MIN_HEAP* tempHeap = (MIN_HEAP*) malloc(sizeof(MIN_HEAP));
-    tempHeap->arrOfVer  = (VERTEX**) malloc(10000*sizeof(VERTEX*));
+    tempHeap->arrOfVer  = (VERTEX**) malloc(200*sizeof(VERTEX*));
     tempHeap->size = 0;
 }
 //vymeni dve hodnoty v heape
@@ -131,7 +131,7 @@ int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
     return result;
 }
 //ohodnoti celu mapu z daneho bodu
-void setMap(VERTEX* mapOfV[100][100], char **mapa, int n, int m, int paStaX, int paStaY) {
+void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaX, int paStaY) {
     MIN_HEAP* heap = NULL;
     VERTEX* temp = mapOfV[paStaX][paStaY];
     temp->val = 0;
@@ -175,7 +175,7 @@ typedef struct node {
 }NODE;
 
 //nastavi zakladne hodnoty do mapy vrcholov
-void initializeMap(VERTEX* mapOfV[100][100], int n, int m) {
+void initializeMap(VERTEX*** mapOfV, int n, int m) {
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             mapOfV[j][i]->val = -1;
@@ -187,6 +187,19 @@ void initializeMap(VERTEX* mapOfV[100][100], int n, int m) {
         }
     }
 }
+
+//uvolni mapu vrcholov
+void freeMap(VERTEX*** mapOfV, int n, int m) {
+    for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) {
+            free(mapOfV[j][i]);
+        }
+        free(mapOfV[j]);
+    }
+    free(mapOfV);
+    mapOfV = NULL;
+}
+
 //zjednoti dve cesty do jednej a aj ich dlzky
 EDGE* mergePaths(EDGE* paFirst, EDGE* paSecond) {
     EDGE* temp = malloc(sizeof(EDGE));
@@ -202,7 +215,7 @@ EDGE* mergePaths(EDGE* paFirst, EDGE* paSecond) {
     return temp;
 }
 //aktualizuje najkratsiu cestu ak je dana cesta kratsia
-void isPathBetter(NODE* paPoints[7], EDGE* paBest, int* paArr, int* paN){
+void isPathBetter(NODE** paPoints, EDGE* paBest, int* paArr, int* paN){
     int val = 0;
     if (paArr[*paN - 1] != *paN - 1) return;
     for (int i = 0; i < *paN - 1; i++){
@@ -216,7 +229,7 @@ void isPathBetter(NODE* paPoints[7], EDGE* paBest, int* paArr, int* paN){
     }
 }
 //vytvara permutacie, ktore sa vyuzivaju ako indexy v poli vrcholov
-void generatePermutation(NODE* paPoints[7], EDGE* paBest, int* paArr, int* paN, int* nam){
+void generatePermutation(NODE** paPoints, EDGE* paBest, int* paArr, int* paN, int* nam){
     for (int i = 1; i <= *paN; i++){
         if (*paN != 1){
             (*paN)--;
@@ -244,8 +257,9 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
     int akt = 0;
     int dragonX = 0, dragonY = 0;
 
-    VERTEX* mapOfV[100][100];
+    VERTEX*** mapOfV = malloc(n*sizeof(VERTEX**));
     for (int j = 0; j < n; j++) {
+        mapOfV[j] = malloc(m*sizeof(VERTEX*));
         for (int i = 0; i < m; i++) {
             mapOfV[j][i] = (VERTEX*)malloc(sizeof(VERTEX));
         }
@@ -257,41 +271,45 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
             if (mapa[j][i] == 'D') {
                 dragonX = i;
                 dragonY = j;
-                finalPath->path = createRoute(mapOfV[dragonY][dragonX], dlzka_cesty);
+                finalPath->path = createRoute(mapOfV[j][i], dlzka_cesty);
                 if (finalPath->path == NULL) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                finalPath->cost = mapOfV[dragonY][dragonX]->val;
+                finalPath->cost = mapOfV[j][i]->val;
+                if (finalPath->cost > t) {
+                    *dlzka_cesty = 0;
+                    return NULL;
+                }
                 finalPath->val = *dlzka_cesty;
             }
             if (mapa[j][i] == 'P') {
                 points[akt]= (NODE*) malloc(sizeof(NODE));
-                points[akt]->x = j;
-                points[akt]->y = i;
+                points[akt]->x = i;
+                points[akt]->y = j;
                 akt++;
             }
         }
     }
     points[akt]= (NODE*) malloc(sizeof(NODE));
-    points[akt]->x = dragonY;
-    points[akt]->y = dragonX;
-    akt++;
+    points[akt]->x = dragonX;
+    points[akt++]->y = dragonY;
     points[akt]=NULL;
+
     for (int i = 0; i < akt; i++) {
         if (points[i] == NULL) break;
         initializeMap(mapOfV, n, m);
-        setMap(mapOfV, mapa, n, m, points[i]->x, points[i]->y);
+        setMap(mapOfV, mapa, n, m, points[i]->y, points[i]->x);
         for (int j = 0; j < akt; j++) {
             points[i]->edges[j] = NULL;
             if (points[i] != points[j]) {
                 points[i]->edges[j] = (EDGE*)malloc(sizeof(EDGE));
-                points[i]->edges[j]->path = createRoute(mapOfV[points[j]->x][points[j]->y], dlzka_cesty);
+                points[i]->edges[j]->path = createRoute(mapOfV[points[j]->y][points[j]->x], dlzka_cesty);
                 if (points[i]->edges[j]->path == NULL) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                points[i]->edges[j]->cost = mapOfV[points[j]->x][points[j]->y]->val;
+                points[i]->edges[j]->cost = mapOfV[points[j]->y][points[j]->x]->val;
                 points[i]->edges[j]->val = *dlzka_cesty;
             }
         }
@@ -302,8 +320,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
     for (int i = 0; i < akt; i++){
         arr[i] = i;
     }
-    int* num;
-    num = malloc(sizeof(int));
+    int* num = malloc(sizeof(int));
     *num = akt;
     EDGE* best = malloc(sizeof(EDGE));
     best->val = 0;
@@ -316,6 +333,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
     }
 
     *dlzka_cesty = finalPath->val;
+    freeMap(mapOfV, n, m);
     return finalPath->path;
 }
 
@@ -373,9 +391,9 @@ int main()
                 break;
             case 3: //pridajte vlastne testovacie vzorky
                 srand(3);
-                n = 100;
+                n = 50;
                 m = 100;
-                t = 12;
+                t = 120;
                 printf("%d %d %d\n", n, m, t);
                 mapa = (char**)malloc(n*sizeof(char*));
                 for (int i = 0; i < n; i++) {

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated>
       <config projectName="Zadanie3" targetName="Zadanie3" />
@@ -13,10 +16,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b034bbec-af17-4c74-ad2a-bdcbbeaf6e3b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/main.c.obj" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/main.c.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/objects.a" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/objects.a" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Zadanie3.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Zadanie3.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +40,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="restartRequiresConfirmation" value="false" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
   <component name="RunManager">
     <configuration name="Zadanie3" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Zadanie3" TARGET_NAME="Zadanie3" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Zadanie3" RUN_TARGET_NAME="Zadanie3">
@@ -65,7 +65,9 @@
       <workItem from="1587477613019" duration="13589000" />
       <workItem from="1587536636907" duration="8438000" />
       <workItem from="1587553467368" duration="31458000" />
-      <workItem from="1587883863973" duration="4480000" />
+      <workItem from="1587883863973" duration="4762000" />
+      <workItem from="1588166326246" duration="304000" />
+      <workItem from="1588237977323" duration="270000" />
     </task>
     <task id="LOCAL-00001" summary="hotovy dijkstra">
       <created>1587628098349</created>
@@ -81,7 +83,14 @@
       <option name="project" value="LOCAL" />
       <updated>1587726400289</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Pracujuca verzia + generovanie map">
+      <created>1587888831315</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1587888831315</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -90,17 +99,22 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="hotovy dijkstra" />
     <MESSAGE value="Prva pracovna verzia + zachranovanie princezien" />
-    <option name="LAST_COMMIT_MESSAGE" value="Prva pracovna verzia + zachranovanie princezien" />
+    <MESSAGE value="Pracujuca verzia + generovanie map" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pracujuca verzia + generovanie map" />
   </component>
   <component name="WindowStateProjectService">
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1587450215239">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1587450215239" />
-    <state x="585" y="114" key="CommitChangelistDialog2" timestamp="1587726397358">
+    <state x="718" y="391" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1587888864739">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1587726397358" />
+    <state x="718" y="391" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1040@0.0.1920.1040" timestamp="1587888864739" />
+    <state x="585" y="114" key="CommitChangelistDialog2" timestamp="1587888829472">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="585" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1587888829472" />
     <state width="510" height="466" key="DebuggerActiveHint" timestamp="1587886654858">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -125,38 +139,38 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="229" key="GridCell.Tab.-1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587541856976" />
-    <state width="1877" height="200" key="GridCell.Tab.0.bottom" timestamp="1587887770010">
+    <state width="1877" height="168" key="GridCell.Tab.0.bottom" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="200" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587887770010" />
-    <state width="1877" height="200" key="GridCell.Tab.0.center" timestamp="1587887770010">
+    <state width="1877" height="168" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state width="1877" height="168" key="GridCell.Tab.0.center" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="200" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587887770010" />
-    <state width="1877" height="200" key="GridCell.Tab.0.left" timestamp="1587887770010">
+    <state width="1877" height="168" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state width="1877" height="168" key="GridCell.Tab.0.left" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="200" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587887770010" />
-    <state width="1877" height="200" key="GridCell.Tab.0.right" timestamp="1587887770010">
+    <state width="1877" height="168" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state width="1877" height="168" key="GridCell.Tab.0.right" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="200" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587887770010" />
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.bottom" timestamp="1587886821562">
+    <state width="1877" height="168" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.bottom" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587886821562" />
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.center" timestamp="1587886821562">
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.center" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587886821562" />
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.left" timestamp="1587886821562">
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.left" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587886821562" />
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.right" timestamp="1587886821562">
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.right" timestamp="1587889089386">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587886821562" />
+    <state x="1496" y="30" width="1877" height="168" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587889089386" />
     <state x="1496" y="60" width="1877" height="229" key="GridCell.Tab.10.bottom" timestamp="1587659853263">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

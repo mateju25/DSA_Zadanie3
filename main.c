@@ -378,8 +378,6 @@ int main()
                 t = 12;
                 printf("%d %d %d\n", n, m, t);
                 mapa = (char**)malloc(n*sizeof(char*));
-                int numberOfQueens = 0;
-                int dragon = 0;
                 for (int i = 0; i < n; i++) {
                     mapa[i] = (char*)malloc(m*sizeof(char));
                     for (int j = 0; j < m; j++) {

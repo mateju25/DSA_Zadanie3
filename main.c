@@ -105,6 +105,7 @@ void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
     if (mapa[(*paTemp)->y][(*paTemp)->x] == 'H') {
         if (((*paTemp)->cost + 2 < (*paNew)->cost) || ((*paNew)->cost == -1)) {
             (*paNew)->cost = (*paTemp)->cost + 2;
+            (*paNew)->length = (*paTemp)->length + 1;
             (*paNew)->before = (*paTemp);
         }
     }
@@ -122,27 +123,34 @@ void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
     }
 }
 //vytvori cestu z daneho vrchola k zaciatku na zaklade predchadzajucich vrcholov
-EDGE* createRoute(VERTEX* paVertex) {
-    EDGE* temp = (EDGE*) malloc(sizeof(EDGE));
+int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
+    VERTEX* temp = paVertex;
     int* result;
-    if (paVertex->before == NULL) {
-        temp->length = 1;
-        temp->cost = paVertex->cost;
-        temp->path = (int*) malloc(2 * sizeof(int));
-        temp->path[1]= paVertex->y;
-        temp->path[0]= paVertex->x;
-        return temp;
+    if (temp->before == NULL) {
+        if (temp != NULL) {
+            *dlzka_cesty = 1;
+            result = (int*)malloc(2 * sizeof(int));
+            result[1]= paVertex->y;
+            result[0]= paVertex->x;
+            return result;
+        }
+        *dlzka_cesty = 0;
+        return NULL;
     }
-    temp->path = (int*)malloc((paVertex->length)*2 * sizeof(int));
-    temp->length = paVertex->length;
-    temp->cost = paVertex->cost;
-    int i = (paVertex->length)*2-1;
+    int amount = 0;
+    while (temp != NULL) {
+        amount++;
+        temp = temp->before;
+    }
+    result = (int*)malloc(amount*2 * sizeof(int));
+    int i = amount*2-1;
+    *dlzka_cesty = amount;
     while (paVertex != NULL) {
-        temp->path[i--] = paVertex->y;
-        temp->path[i--] = paVertex->x;
+        result[i--] = paVertex->y;
+        result[i--] = paVertex->x;
         paVertex = paVertex->before;
     }
-    return temp;
+    return result;
 }
 //ohodnoti celu mapu z daneho bodu
 void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaX, int paStaY) {
@@ -187,7 +195,7 @@ void initializeMap(VERTEX*** mapOfV, int n, int m) {
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             mapOfV[j][i]->cost = -1;
-            mapOfV[j][i]->length = 1;
+            mapOfV[j][i]->length = 0;
             mapOfV[j][i]->x = i;
             mapOfV[j][i]->y = j;
             mapOfV[j][i]->seen = 0;
@@ -259,7 +267,8 @@ void generatePermutation(NODE** paPoints, EDGE* paBest, int* paArr, int* paN, in
 }
 //vrati celu cestu od zaciatku az po poslednu princeznu
 int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
-    EDGE* finalPath;
+    EDGE* finalPath = (EDGE*)malloc(sizeof(EDGE));
+    finalPath->path = (int*)malloc(sizeof(int));
     NODE* points[7];
     int akt = 0;
     int dragonX = 0, dragonY = 0;
@@ -271,7 +280,6 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
             mapOfV[j][i] = (VERTEX*)malloc(sizeof(VERTEX));
         }
     }
-
     initializeMap(mapOfV, n, m);
     setMap(mapOfV, mapa, n, m, 0, 0);
     for (int j = 0; j < n; j++) {
@@ -279,11 +287,17 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
             if (mapa[j][i] == 'D') {
                 dragonX = i;
                 dragonY = j;
-                finalPath = createRoute(mapOfV[j][i]);
-                if (((finalPath->length == 1) || (finalPath->cost > t)) && (mapa[0][0] != 'D')) {
+                finalPath->path = createRoute(mapOfV[j][i], dlzka_cesty);
+                if (finalPath->path == NULL) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
+                finalPath->cost = mapOfV[j][i]->cost;
+                if (finalPath->cost > t) {
+                    *dlzka_cesty = 0;
+                    return NULL;
+                }
+                finalPath->length = *dlzka_cesty;
             }
             if (mapa[j][i] == 'P') {
                 points[akt]= (NODE*) malloc(sizeof(NODE));
@@ -305,11 +319,14 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
         for (int j = 0; j < akt; j++) {
             points[i]->edges[j] = NULL;
             if (points[i] != points[j]) {
-                points[i]->edges[j] = createRoute(mapOfV[points[j]->y][points[j]->x]);
+                points[i]->edges[j] = (EDGE*)malloc(sizeof(EDGE));
+                points[i]->edges[j]->path = createRoute(mapOfV[points[j]->y][points[j]->x], dlzka_cesty);
                 if (points[i]->edges[j]->path == NULL) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
+                points[i]->edges[j]->cost = mapOfV[points[j]->y][points[j]->x]->cost;
+                points[i]->edges[j]->length = *dlzka_cesty;
             }
         }
         points[i]->edges[akt] = NULL;

@@ -6,7 +6,8 @@
 
 //struktura vrcholu
 typedef struct vertex {
-    int val;    //hodnota pre ohodnotenie pomocou dijkstru
+    int cost;    //hodnota pre ohodnotenie pomocou dijkstru
+    int length;    //dlzka cesty
     int indexInHeap;    //index v halde potrebny na update haldy
     char seen;  //ukazuje ci uz som vrchol vyvazil
     char x, y;  //suradnice v mape
@@ -21,7 +22,7 @@ typedef struct heap {
 //vytvori minimal heap
 MIN_HEAP* createHeap() {
     MIN_HEAP* tempHeap = (MIN_HEAP*) malloc(sizeof(MIN_HEAP));
-    tempHeap->arrOfVer  = (VERTEX**) malloc(300*sizeof(VERTEX*));
+    tempHeap->arrOfVer  = (VERTEX**) malloc(500*sizeof(VERTEX*));
     tempHeap->size = 0;
 }
 //vymeni dve hodnoty v heape
@@ -35,7 +36,7 @@ void swapInHeap(MIN_HEAP** root, int indexA, int indexB) {
 //presetri ci je splnena vlastnost heapu
 void heapify(MIN_HEAP** root, int index) {
     if (index <= 1) return;
-    while ((*root)->arrOfVer[index]->val < (*root)->arrOfVer[index/2]->val) {
+    while ((*root)->arrOfVer[index]->cost < (*root)->arrOfVer[index/2]->cost) {
         swapInHeap(root, index, index/2);
         index /= 2;
         if (index <= 1) break;
@@ -54,7 +55,7 @@ void insertHeap(MIN_HEAP** root, VERTEX* paNew) {
 VERTEX* popFromHeap(MIN_HEAP** root) {
     if ((*root)->size == 0) return NULL;
     VERTEX* first = (*root)->arrOfVer[1];
-    (*root)->arrOfVer[1] = (*root)->arrOfVer[(*root)->size];
+    (*root)->arrOfVer[1] = (*root)->arrOfVer[(*root)->size];//prerobit indexovanie
     (*root)->arrOfVer[(*root)->size] = NULL;
     (*root)->size--;
     for (int i = 1; i < (*root)->size+1; i++) {
@@ -65,12 +66,12 @@ VERTEX* popFromHeap(MIN_HEAP** root) {
         return first;
     }
     if ((*root)->size == 2) {
-        if((*root)->arrOfVer[1]->val > (*root)->arrOfVer[2]->val) swapInHeap(root, 1, 2);
+        if((*root)->arrOfVer[1]->cost > (*root)->arrOfVer[2]->cost) swapInHeap(root, 1, 2);
         return first;
     }
-    while (((*root)->arrOfVer[index]->val >= (*root)->arrOfVer[index*2]->val) || ((*root)->arrOfVer[index]->val >= (*root)->arrOfVer[index*2+1]->val)) {
+    while (((*root)->arrOfVer[index]->cost >= (*root)->arrOfVer[index*2]->cost) || ((*root)->arrOfVer[index]->cost >= (*root)->arrOfVer[index*2+1]->cost)) {
         if ((*root)->arrOfVer[index*2+1] != NULL) {
-            if ((*root)->arrOfVer[index * 2]->val > (*root)->arrOfVer[index * 2 + 1]->val) {
+            if ((*root)->arrOfVer[index * 2]->cost > (*root)->arrOfVer[index * 2 + 1]->cost) {
                 swapInHeap(root, index, index * 2 + 1);
                 index = index * 2 + 1;
             }
@@ -93,20 +94,28 @@ VERTEX* popFromHeap(MIN_HEAP** root) {
 /*---------------------------------------------------------------------------------------------*/
 //region Dijkstra
 
+typedef struct edge {
+    int length;
+    int cost;
+    int* path;
+}EDGE;
+
 //vlozi alebo updatne vrchol v halde
 void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
     if (mapa[(*paTemp)->y][(*paTemp)->x] == 'H') {
-        if (((*paTemp)->val + 2 < (*paNew)->val) || ((*paNew)->val == -1)) {
-            (*paNew)->val = (*paTemp)->val + 2;
+        if (((*paTemp)->cost + 2 < (*paNew)->cost) || ((*paNew)->cost == -1)) {
+            (*paNew)->cost = (*paTemp)->cost + 2;
+            (*paNew)->length = (*paTemp)->length + 1;
             (*paNew)->before = (*paTemp);
         }
     }
     else {
-        if (((*paTemp)->val + 1 < (*paNew)->val) || ((*paNew)->val == -1)) {
-            (*paNew)->val = (*paTemp)->val + 1;
+        if (((*paTemp)->cost + 1 < (*paNew)->cost) || ((*paNew)->cost == -1)) {
+            (*paNew)->cost = (*paTemp)->cost + 1;
             (*paNew)->before = (*paTemp);
         }
     }
+    (*paNew)->length = (*paTemp)->length + 1;
     if ((*paNew)->indexInHeap != 0)
         heapify(heap, (*paNew)->indexInHeap);
     else {
@@ -116,7 +125,15 @@ void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
 //vytvori cestu z daneho vrchola k zaciatku na zaklade predchadzajucich vrcholov
 int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
     VERTEX* temp = paVertex;
+    int* result;
     if (temp->before == NULL) {
+        if (temp != NULL) {
+            *dlzka_cesty = 1;
+            result = (int*)malloc(2 * sizeof(int));
+            result[1]= paVertex->y;
+            result[0]= paVertex->x;
+            return result;
+        }
         *dlzka_cesty = 0;
         return NULL;
     }
@@ -125,7 +142,7 @@ int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
         amount++;
         temp = temp->before;
     }
-    int* result = (int*)malloc(amount*2 * sizeof(int));
+    result = (int*)malloc(amount*2 * sizeof(int));
     int i = amount*2-1;
     *dlzka_cesty = amount;
     while (paVertex != NULL) {
@@ -139,7 +156,7 @@ int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
 void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaX, int paStaY) {
     MIN_HEAP* heap = NULL;
     VERTEX* temp = mapOfV[paStaX][paStaY];
-    temp->val = 0;
+    temp->cost = 0;
     insertHeap(&heap, temp);
     while ((temp = popFromHeap(&heap))!=NULL) {
         mapOfV[temp->y][temp->x]->seen = 1;
@@ -168,12 +185,6 @@ void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaX, int paStaY)
 /*---------------------------------------------------------------------------------------------*/
 //region Finding Path
 
-typedef struct edge {
-    int val;
-    int cost;
-    int* path;
-}EDGE;
-
 typedef struct node {
     int x, y;
     EDGE* edges[7];
@@ -183,7 +194,8 @@ typedef struct node {
 void initializeMap(VERTEX*** mapOfV, int n, int m) {
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
-            mapOfV[j][i]->val = -1;
+            mapOfV[j][i]->cost = -1;
+            mapOfV[j][i]->length = 0;
             mapOfV[j][i]->x = i;
             mapOfV[j][i]->y = j;
             mapOfV[j][i]->seen = 0;
@@ -208,14 +220,14 @@ void freeMap(VERTEX*** mapOfV, int n, int m) {
 //zjednoti dve cesty do jednej a aj ich dlzky
 EDGE* mergePaths(EDGE* paFirst, EDGE* paSecond) {
     EDGE* temp = (EDGE*)malloc(sizeof(EDGE));
-    temp->path = (int*)malloc((paFirst->val + paSecond->val-1)*2*sizeof(int));
-    temp->val = paFirst->val + paSecond->val-1;
+    temp->path = (int*)malloc((paFirst->length + paSecond->length-1)*2*sizeof(int));
+    temp->length = paFirst->length + paSecond->length-1;
     int i = 0;
-    for (i = 0; i < paFirst->val*2-2; i++) {
+    for (i = 0; i < paFirst->length*2-2; i++) {
         temp->path[i] = paFirst->path[i];
     }
-    for (i = 0; i < paSecond->val*2; i++) {
-        temp->path[paFirst->val*2-2 + i] = paSecond->path[i];
+    for (i = 0; i < paSecond->length*2; i++) {
+        temp->path[paFirst->length*2-2 + i] = paSecond->path[i];
     }
     return temp;
 }
@@ -269,7 +281,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
         }
     }
     initializeMap(mapOfV, n, m);
-    setMap(mapOfV, mapa, n, m, 50, 50);
+    setMap(mapOfV, mapa, n, m, 0, 0);
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             if (mapa[j][i] == 'D') {
@@ -280,12 +292,12 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                finalPath->cost = mapOfV[j][i]->val;
+                finalPath->cost = mapOfV[j][i]->cost;
                 if (finalPath->cost > t) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                finalPath->val = *dlzka_cesty;
+                finalPath->length = *dlzka_cesty;
             }
             if (mapa[j][i] == 'P') {
                 points[akt]= (NODE*) malloc(sizeof(NODE));
@@ -313,8 +325,8 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                points[i]->edges[j]->cost = mapOfV[points[j]->y][points[j]->x]->val;
-                points[i]->edges[j]->val = *dlzka_cesty;
+                points[i]->edges[j]->cost = mapOfV[points[j]->y][points[j]->x]->cost;
+                points[i]->edges[j]->length = *dlzka_cesty;
             }
         }
         points[i]->edges[akt] = NULL;
@@ -327,7 +339,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
     int* num = (int*)malloc(sizeof(int));
     *num = akt;
     EDGE* best = malloc(sizeof(EDGE));
-    best->val = 0;
+    best->length = 0;
     best->cost = 10000;
     best->path = (int*) malloc(akt*sizeof(int));
     generatePermutation(points, best, arr, num, &akt);
@@ -336,7 +348,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
         finalPath = mergePaths(finalPath, points[best->path[i]]->edges[best->path[i-1]]);
     }
 
-    *dlzka_cesty = finalPath->val;
+    *dlzka_cesty = finalPath->length;
     freeMap(mapOfV, n, m);
     return finalPath->path;
 }

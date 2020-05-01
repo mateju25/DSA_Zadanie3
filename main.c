@@ -21,7 +21,7 @@ typedef struct heap {
 //vytvori minimal heap
 MIN_HEAP* createHeap() {
     MIN_HEAP* tempHeap = (MIN_HEAP*) malloc(sizeof(MIN_HEAP));
-    tempHeap->arrOfVer  = (VERTEX**) malloc(200*sizeof(VERTEX*));
+    tempHeap->arrOfVer  = (VERTEX**) malloc(300*sizeof(VERTEX*));
     tempHeap->size = 0;
 }
 //vymeni dve hodnoty v heape
@@ -52,6 +52,7 @@ void insertHeap(MIN_HEAP** root, VERTEX* paNew) {
 }
 //vytiahne najmensi prvok a presetri vlastnost heapu
 VERTEX* popFromHeap(MIN_HEAP** root) {
+    if ((*root)->size == 0) return NULL;
     VERTEX* first = (*root)->arrOfVer[1];
     (*root)->arrOfVer[1] = (*root)->arrOfVer[(*root)->size];
     (*root)->arrOfVer[(*root)->size] = NULL;
@@ -115,12 +116,16 @@ void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
 //vytvori cestu z daneho vrchola k zaciatku na zaklade predchadzajucich vrcholov
 int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
     VERTEX* temp = paVertex;
+    if (temp->before == NULL) {
+        *dlzka_cesty = 0;
+        return NULL;
+    }
     int amount = 0;
     while (temp != NULL) {
         amount++;
         temp = temp->before;
     }
-    int* result = malloc((amount)*2 * sizeof(int));
+    int* result = (int*)malloc(amount*2 * sizeof(int));
     int i = amount*2-1;
     *dlzka_cesty = amount;
     while (paVertex != NULL) {
@@ -202,8 +207,8 @@ void freeMap(VERTEX*** mapOfV, int n, int m) {
 
 //zjednoti dve cesty do jednej a aj ich dlzky
 EDGE* mergePaths(EDGE* paFirst, EDGE* paSecond) {
-    EDGE* temp = malloc(sizeof(EDGE));
-    temp->path = malloc((paFirst->val + paSecond->val-1)*2*sizeof(int));
+    EDGE* temp = (EDGE*)malloc(sizeof(EDGE));
+    temp->path = (int*)malloc((paFirst->val + paSecond->val-1)*2*sizeof(int));
     temp->val = paFirst->val + paSecond->val-1;
     int i = 0;
     for (i = 0; i < paFirst->val*2-2; i++) {
@@ -250,22 +255,21 @@ void generatePermutation(NODE** paPoints, EDGE* paBest, int* paArr, int* paN, in
 }
 //vrati celu cestu od zaciatku az po poslednu princeznu
 int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
-    EDGE* finalPath = malloc(sizeof(EDGE));
-    finalPath->path = malloc(sizeof(int));
-    finalPath->path = NULL;
+    EDGE* finalPath = (EDGE*)malloc(sizeof(EDGE));
+    finalPath->path = (int*)malloc(sizeof(int));
     NODE* points[7];
     int akt = 0;
     int dragonX = 0, dragonY = 0;
 
-    VERTEX*** mapOfV = malloc(n*sizeof(VERTEX**));
+    VERTEX*** mapOfV = (VERTEX***)malloc(n*sizeof(VERTEX**));
     for (int j = 0; j < n; j++) {
-        mapOfV[j] = malloc(m*sizeof(VERTEX*));
+        mapOfV[j] = (VERTEX**)malloc(m*sizeof(VERTEX*));
         for (int i = 0; i < m; i++) {
             mapOfV[j][i] = (VERTEX*)malloc(sizeof(VERTEX));
         }
     }
     initializeMap(mapOfV, n, m);
-    setMap(mapOfV, mapa, n, m, 0, 0);
+    setMap(mapOfV, mapa, n, m, 50, 50);
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
             if (mapa[j][i] == 'D') {
@@ -316,11 +320,11 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
         points[i]->edges[akt] = NULL;
     }
 
-    int* arr = malloc(akt*sizeof(int));
+    int* arr = (int*)malloc(akt*sizeof(int));
     for (int i = 0; i < akt; i++){
         arr[i] = i;
     }
-    int* num = malloc(sizeof(int));
+    int* num = (int*)malloc(sizeof(int));
     *num = akt;
     EDGE* best = malloc(sizeof(EDGE));
     best->val = 0;
@@ -389,15 +393,15 @@ int main()
                 mapa[9]="HHHPCCCCCC";
                 cesta = zachran_princezne(mapa, n, m, t, &dlzka_cesty);
                 break;
-            case 3: //pridajte vlastne testovacie vzorky
-                srand(3);
-                n = 50;
-                m = 100;
-                t = 120;
-                printf("%d %d %d\n", n, m, t);
-                mapa = (char**)malloc(n*sizeof(char*));
+            case 3: {//pridajte vlastne testovacie vzorky
+                int seed = 0;
+                printf("Seed: ");
+                scanf("%d", &seed);
+                srand(seed);
+                scanf("%d %d %d", &n, &m, &t);
+                mapa = (char **) malloc(n * sizeof(char *));
                 for (int i = 0; i < n; i++) {
-                    mapa[i] = (char*)malloc(m*sizeof(char));
+                    mapa[i] = (char *) malloc(m * sizeof(char));
                     for (int j = 0; j < m; j++) {
 
                         int x = rand() % 10;
@@ -411,11 +415,12 @@ int main()
                             case 8 ... 9:
                                 mapa[i][j] = 'N';
                                 break;
-                            default:break;
+                            default:
+                                break;
                         }
                     }
                 }
-                mapa[0][0]='C';
+                mapa[0][0] = 'C';
                 mapa[rand() % n][rand() % m] = 'D';
                 for (int i = 0; i < 5; i++) {
                     mapa[rand() % n][rand() % m] = 'P';
@@ -429,6 +434,7 @@ int main()
                 }
                 cesta = zachran_princezne(mapa, n, m, t, &dlzka_cesty);
                 break;
+            }
             default:
                 continue;
         }

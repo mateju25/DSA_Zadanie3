@@ -123,34 +123,21 @@ void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
     }
 }
 //vytvori cestu z daneho vrchola k zaciatku na zaklade predchadzajucich vrcholov
-int* createRoute(VERTEX* paVertex, int* dlzka_cesty) {
-    VERTEX* temp = paVertex;
-    int* result;
-    if (temp->before == NULL) {
-        if (temp != NULL) {
-            *dlzka_cesty = 1;
-            result = (int*)malloc(2 * sizeof(int));
-            result[1]= paVertex->y;
-            result[0]= paVertex->x;
-            return result;
-        }
-        *dlzka_cesty = 0;
+EDGE* createRoute(VERTEX* paVertex) {
+    EDGE* temp = (EDGE*) malloc(sizeof(EDGE));
+    temp->path = (int*) malloc((paVertex->length+1)*2*sizeof(int));
+    temp->length = paVertex->length+1;
+    temp->cost = paVertex->cost;
+    if (paVertex->before == NULL) {
         return NULL;
     }
-    int amount = 0;
-    while (temp != NULL) {
-        amount++;
-        temp = temp->before;
-    }
-    result = (int*)malloc(amount*2 * sizeof(int));
-    int i = amount*2-1;
-    *dlzka_cesty = amount;
+    int i = temp->length*2-1;
     while (paVertex != NULL) {
-        result[i--] = paVertex->y;
-        result[i--] = paVertex->x;
+        temp->path[i--] = paVertex->y;
+        temp->path[i--] = paVertex->x;
         paVertex = paVertex->before;
     }
-    return result;
+    return temp;
 }
 //ohodnoti celu mapu z daneho bodu
 void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaX, int paStaY) {
@@ -267,8 +254,7 @@ void generatePermutation(NODE** paPoints, EDGE* paBest, int* paArr, int* paN, in
 }
 //vrati celu cestu od zaciatku az po poslednu princeznu
 int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
-    EDGE* finalPath = (EDGE*)malloc(sizeof(EDGE));
-    finalPath->path = (int*)malloc(sizeof(int));
+    EDGE* finalPath;
     NODE* points[7];
     int akt = 0;
     int dragonX = 0, dragonY = 0;
@@ -287,17 +273,20 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
             if (mapa[j][i] == 'D') {
                 dragonX = i;
                 dragonY = j;
-                finalPath->path = createRoute(mapOfV[j][i], dlzka_cesty);
-                if (finalPath->path == NULL) {
+                if ((i == 0) && (j == 0)) {
+                    finalPath = (EDGE*) malloc(sizeof(EDGE));
+                    finalPath->path = (int*) malloc(2*sizeof(int));
+                    finalPath->cost = 0;
+                    finalPath->length = 1;
+                    finalPath->path[1] = 0;
+                    finalPath->path[0] = 0;
+                    continue;
+                }
+                finalPath = createRoute(mapOfV[j][i]);
+                if (finalPath == NULL) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                finalPath->cost = mapOfV[j][i]->cost;
-                if (finalPath->cost > t) {
-                    *dlzka_cesty = 0;
-                    return NULL;
-                }
-                finalPath->length = *dlzka_cesty;
             }
             if (mapa[j][i] == 'P') {
                 points[akt]= (NODE*) malloc(sizeof(NODE));
@@ -319,14 +308,11 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
         for (int j = 0; j < akt; j++) {
             points[i]->edges[j] = NULL;
             if (points[i] != points[j]) {
-                points[i]->edges[j] = (EDGE*)malloc(sizeof(EDGE));
-                points[i]->edges[j]->path = createRoute(mapOfV[points[j]->y][points[j]->x], dlzka_cesty);
-                if (points[i]->edges[j]->path == NULL) {
+                points[i]->edges[j] = createRoute(mapOfV[points[j]->y][points[j]->x]);
+                if (points[i]->edges[j] == NULL) {
                     *dlzka_cesty = 0;
                     return NULL;
                 }
-                points[i]->edges[j]->cost = mapOfV[points[j]->y][points[j]->x]->cost;
-                points[i]->edges[j]->length = *dlzka_cesty;
             }
         }
         points[i]->edges[akt] = NULL;

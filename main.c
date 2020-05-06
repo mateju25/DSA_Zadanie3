@@ -13,7 +13,6 @@ typedef struct vertex {
     int cost;    //hodnota pre ohodnotenie pomocou dijkstru
     int length;    //dlzka cesty
     int indexInHeap;    //index v halde potrebny na update haldy
-    int seen;  //ukazuje ci uz som vrchol vyvazil
     int x, y;  //suradnice v mape
     struct vertex* before;  //ukazovatel na vrchol, z ktoreho som sa dostal do tohto vrchola
 }VERTEX;
@@ -26,7 +25,7 @@ typedef struct heap {
 //vytvori minimal heap
 MIN_HEAP* createHeap() {
     MIN_HEAP* tempHeap = (MIN_HEAP*) malloc(sizeof(MIN_HEAP));
-    tempHeap->arrOfVer  = (VERTEX**) malloc(500*sizeof(VERTEX*));
+    tempHeap->arrOfVer  = (VERTEX**) malloc(1000*sizeof(VERTEX*));
     tempHeap->size = 0;
 }
 //vymeni dve hodnoty v heape
@@ -60,6 +59,7 @@ void insertHeap(MIN_HEAP** root, VERTEX* paNew) {
 VERTEX* popFromHeap(MIN_HEAP** root) {
     if ((*root)->size == 0) return NULL;
     VERTEX* first = (*root)->arrOfVer[1];
+    first->indexInHeap = -1;
     (*root)->arrOfVer[1] = (*root)->arrOfVer[(*root)->size];
     (*root)->arrOfVer[1]->indexInHeap = 1;
     (*root)->arrOfVer[(*root)->size] = NULL;
@@ -123,7 +123,7 @@ void relax(char **mapa, MIN_HEAP** heap, VERTEX** paNew, VERTEX** paTemp) {
             (*paNew)->before = (*paTemp);
         }
     }
-    if ((*paNew)->indexInHeap != 0)
+    if ((*paNew)->indexInHeap > 0)
         //ak uz vrchol je v halde
         heapify(heap, (*paNew)->indexInHeap);
     else
@@ -147,42 +147,40 @@ EDGE* createRoute(char **mapa, VERTEX* paVertex) {
         temp->path[i--] = paVertex->x;
         paVertex = paVertex->before;
     }
-    //na zaklade prveho policka cesty, mi aktualizuj cas
-    if (mapa[temp->path[1]][temp->path[0]] == 'H')
-        temp->cost += 2;
-    else
-        temp->cost += 1;
     return temp;
 }
 //ohodnoti celu mapu z daneho bodu
-void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaX, int paStaY) {
+void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaY, int paStaX) {
     MIN_HEAP* heap = NULL;
-    VERTEX* temp = mapOfV[paStaX][paStaY];
-    temp->cost = 0;
+    VERTEX* temp = mapOfV[paStaY][paStaX];
+    if (mapa[paStaY][paStaX] == 'H')
+        temp->cost = 2;
+    else
+        temp->cost = 1;
+    if (mapa[paStaY][paStaX] == 'N') return;
     insertHeap(&heap, temp);
-    if (mapa[paStaX][paStaY] == 'N') return;
+
     //popni z haldy a zacni dijkstru
     while ((temp = popFromHeap(&heap))!=NULL) {
-        mapOfV[temp->y][temp->x]->seen = 1;
-        if ( (temp->x+1 < m) &&((mapOfV[temp->y][temp->x+1]->seen == 0)&&(mapa[temp->y][temp->x+1] != 'N'))) {
+        if ( (temp->x+1 < m) &&((mapOfV[temp->y][temp->x+1]->indexInHeap == 0)&&(mapa[temp->y][temp->x+1] != 'N'))) {
             //pozri praveho suseda
             VERTEX* new = mapOfV[temp->y][temp->x+1];
             //zrelaxuj
             relax(mapa, &heap, &new, &temp);
         }
-        if ((temp->x-1 >= 0) &&((mapOfV[temp->y][temp->x-1]->seen == 0)&&(mapa[temp->y][temp->x-1] != 'N'))) {
+        if ((temp->x-1 >= 0) &&((mapOfV[temp->y][temp->x-1]->indexInHeap == 0)&&(mapa[temp->y][temp->x-1] != 'N'))) {
             //pozri laveho suseda
             VERTEX* new = mapOfV[temp->y][temp->x-1];
             //zrelaxuj
             relax(mapa, &heap, &new, &temp);
         }
-        if ((temp->y+1 < n) &&((mapOfV[temp->y+1][temp->x]->seen == 0)&&(mapa[temp->y+1][temp->x] != 'N'))) {
+        if ((temp->y+1 < n) &&((mapOfV[temp->y+1][temp->x]->indexInHeap == 0)&&(mapa[temp->y+1][temp->x] != 'N'))) {
             //pozri dolneho suseda
             VERTEX* new = mapOfV[temp->y+1][temp->x];
             //zrelaxuj
             relax(mapa, &heap, &new, &temp);
         }
-        if ((temp->y-1 >= 0) && ((mapOfV[temp->y-1][temp->x]->seen == 0)&&(mapa[temp->y-1][temp->x] != 'N'))) {
+        if ((temp->y-1 >= 0) && ((mapOfV[temp->y-1][temp->x]->indexInHeap == 0)&&(mapa[temp->y-1][temp->x] != 'N'))) {
             //pozri horneho suseda
             VERTEX* new = mapOfV[temp->y-1][temp->x];
             //zrelaxuj
@@ -202,17 +200,18 @@ typedef struct node {
 }NODE;
 
 //nastavi zakladne hodnoty do mapy vrcholov
-void initializeMap(VERTEX*** mapOfV, int n, int m) {
+void initializeMap(VERTEX*** mapOfV, char **mapa, int n, int m) {
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
-            //nastavi mapu vrcholov na zakladne hodnoty
-            mapOfV[j][i]->cost = -1;
-            mapOfV[j][i]->length = 0;
-            mapOfV[j][i]->x = i;
-            mapOfV[j][i]->y = j;
-            mapOfV[j][i]->seen = 0;
-            mapOfV[j][i]->indexInHeap = 0;
-            mapOfV[j][i]->before = NULL;
+            if (mapa[j][i]!='N') {
+                //nastavi mapu vrcholov na zakladne hodnoty
+                mapOfV[j][i]->cost = -1;
+                mapOfV[j][i]->length = 0;
+                mapOfV[j][i]->x = i;
+                mapOfV[j][i]->y = j;
+                mapOfV[j][i]->indexInHeap = 0;
+                mapOfV[j][i]->before = NULL;
+            }
         }
     }
 }
@@ -221,7 +220,8 @@ void initializeMap(VERTEX*** mapOfV, int n, int m) {
 void freeMap(VERTEX*** mapOfV, int n, int m) {
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) {
-            free(mapOfV[j][i]);
+            if (mapOfV[j][i] != NULL)
+                free(mapOfV[j][i]);
         }
         free(mapOfV[j]);
     }
@@ -243,6 +243,10 @@ EDGE* mergePaths(EDGE* paFirst, EDGE* paSecond) {
         //nakopiruj druhu cestu
         temp->path[paFirst->length*2-2 + i] = paSecond->path[i];
     }
+    free(paFirst->path);
+    free(paFirst);
+    free(paSecond->path);
+    free(paSecond);
     return temp;
 }
 //aktualizuje najkratsiu cestu ak je dana cesta kratsia
@@ -299,7 +303,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
         }
     }
 
-    initializeMap(mapOfV, n, m);
+    initializeMap(mapOfV, mapa, n, m);
     setMap(mapOfV, mapa, n, m, 0, 0);
     for (j = 0; j < n; j++) {
         for (i = 0; i < m; i++) {
@@ -320,6 +324,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
                 finalPath = createRoute(mapa, mapOfV[j][i]);
                 if ((finalPath == NULL) || (finalPath->cost > t)) {
                     //ak neni cesta, alebo je malo casu na zabitie draka
+                    printf("Cesta neexistuje.\n");
                     *dlzka_cesty = 0;
                     return NULL;
                 }
@@ -340,7 +345,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
 
     for (i = 0; i < akt; i++) {
         if (points[i] == NULL) break;
-        initializeMap(mapOfV, n, m);
+        initializeMap(mapOfV, mapa, n, m);
         setMap(mapOfV, mapa, n, m, points[i]->y, points[i]->x);
         for (j = 0; j < akt; j++) {
             points[i]->edges[j] = NULL;
@@ -348,6 +353,8 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
                 //vytvor cesty od kazdeho doleziteho vrchola ku kazdemu inemu
                 points[i]->edges[j] = createRoute(mapa, mapOfV[points[j]->y][points[j]->x]);
                 if (points[i]->edges[j] == NULL) {
+                    //ak cesta neexistuje
+                    printf("Cesta neexistuje.\n");
                     *dlzka_cesty = 0;
                     return NULL;
                 }
@@ -389,6 +396,7 @@ int main()
     int i, test, dlzka_cesty, cas, *cesta;
     int n=0, m=0, t=0;
     FILE* f;
+    char s[50];
     while(1){
         printf("Zadajte cislo testu (0 ukonci program):\n");
         scanf("%d",&test);
@@ -398,7 +406,9 @@ int main()
             case 0://ukonci program
                 return 0;
             case 1://nacitanie mapy zo suboru
-                f=fopen("test.txt","r");
+                printf("Zadaj meno suboru: ");
+                scanf("%s", s);
+                f=fopen(s,"r");
                 if(f)
                     fscanf(f, "%d %d %d", &n, &m, &t);
                 else

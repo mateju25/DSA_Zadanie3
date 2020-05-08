@@ -162,25 +162,25 @@ void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaY, int paStaX)
 
     //popni z haldy a zacni dijkstru
     while ((temp = popFromHeap(&heap))!=NULL) {
-        if ( (temp->x+1 < m) &&((mapOfV[temp->y][temp->x+1]->indexInHeap == 0)&&(mapa[temp->y][temp->x+1] != 'N'))) {
+        if ( (temp->x+1 < m) &&((mapOfV[temp->y][temp->x+1]->indexInHeap >= 0)&&(mapa[temp->y][temp->x+1] != 'N'))) {
             //pozri praveho suseda
             VERTEX* new = mapOfV[temp->y][temp->x+1];
             //zrelaxuj
             relax(mapa, &heap, &new, &temp);
         }
-        if ((temp->x-1 >= 0) &&((mapOfV[temp->y][temp->x-1]->indexInHeap == 0)&&(mapa[temp->y][temp->x-1] != 'N'))) {
+        if ((temp->x-1 >= 0) &&((mapOfV[temp->y][temp->x-1]->indexInHeap >= 0)&&(mapa[temp->y][temp->x-1] != 'N'))) {
             //pozri laveho suseda
             VERTEX* new = mapOfV[temp->y][temp->x-1];
             //zrelaxuj
             relax(mapa, &heap, &new, &temp);
         }
-        if ((temp->y+1 < n) &&((mapOfV[temp->y+1][temp->x]->indexInHeap == 0)&&(mapa[temp->y+1][temp->x] != 'N'))) {
+        if ((temp->y+1 < n) &&((mapOfV[temp->y+1][temp->x]->indexInHeap >= 0)&&(mapa[temp->y+1][temp->x] != 'N'))) {
             //pozri dolneho suseda
             VERTEX* new = mapOfV[temp->y+1][temp->x];
             //zrelaxuj
             relax(mapa, &heap, &new, &temp);
         }
-        if ((temp->y-1 >= 0) && ((mapOfV[temp->y-1][temp->x]->indexInHeap == 0)&&(mapa[temp->y-1][temp->x] != 'N'))) {
+        if ((temp->y-1 >= 0) && ((mapOfV[temp->y-1][temp->x]->indexInHeap >= 0)&&(mapa[temp->y-1][temp->x] != 'N'))) {
             //pozri horneho suseda
             VERTEX* new = mapOfV[temp->y-1][temp->x];
             //zrelaxuj

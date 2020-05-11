@@ -1,6 +1,6 @@
 /**
  * Autor: Matej Delincak
- * Datum poslednej upravy: 14.5.2020
+ * Datum poslednej upravy: 9.5.2020
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,7 +25,7 @@ typedef struct heap {
 //vytvori minimal heap
 MIN_HEAP* createHeap() {
     MIN_HEAP* tempHeap = (MIN_HEAP*) malloc(sizeof(MIN_HEAP));
-    tempHeap->arrOfVer  = (VERTEX**) malloc(1000*sizeof(VERTEX*));
+    tempHeap->arrOfVer  = (VERTEX**) malloc((1000)*sizeof(VERTEX*));
     tempHeap->size = 0;
 }
 //vymeni dve hodnoty v heape
@@ -48,8 +48,6 @@ void heapify(MIN_HEAP** root, int index) {
 }
 //vlozi do heapu
 void insertHeap(MIN_HEAP** root, VERTEX* paNew) {
-    if (*root == NULL)
-        *root = createHeap();
     (*root)->arrOfVer[(*root)->size+1] = paNew;
     (*root)->arrOfVer[(*root)->size+1]->indexInHeap = (*root)->size;
     heapify(root, (*root)->size+1);
@@ -151,7 +149,7 @@ EDGE* createRoute(char **mapa, VERTEX* paVertex) {
 }
 //ohodnoti celu mapu z daneho bodu
 void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaY, int paStaX) {
-    MIN_HEAP* heap = NULL;
+    MIN_HEAP* heap = createHeap();
     VERTEX* temp = mapOfV[paStaY][paStaX];
     if (mapa[paStaY][paStaX] == 'H')
         temp->cost = 2;
@@ -187,6 +185,8 @@ void setMap(VERTEX*** mapOfV, char **mapa, int n, int m, int paStaY, int paStaX)
             relax(mapa, &heap, &new, &temp);
         }
     }
+    free(heap->arrOfVer);
+    free(heap);
 }
 //endregion
 /*---------------------------------------------------------------------------------------------*/
@@ -299,6 +299,12 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
     for (j = 0; j < n; j++) {
         mapOfV[j] = (VERTEX**)malloc(m*sizeof(VERTEX*));
         for (i = 0; i < m; i++) {
+            if ((mapa[j][i] != 'C') && (mapa[j][i] != 'D') && (mapa[j][i] != 'P') && (mapa[j][i] != 'N') && (mapa[j][i] != 'H')) {
+                //testujem validitu mapy
+                printf("Chyba v mape.\n");
+                *dlzka_cesty = 0;
+                return NULL;
+            }
             mapOfV[j][i] = (VERTEX*)malloc(sizeof(VERTEX));
         }
     }
@@ -324,7 +330,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
                 finalPath = createRoute(mapa, mapOfV[j][i]);
                 if ((finalPath == NULL) || (finalPath->cost > t)) {
                     //ak neni cesta, alebo je malo casu na zabitie draka
-                    printf("Cesta neexistuje.\n");
+                    printf("Cesta neexistuje ku drakovi.\n");
                     *dlzka_cesty = 0;
                     return NULL;
                 }
@@ -354,7 +360,7 @@ int *zachran_princezne(char **mapa, int n, int m, int t, int *dlzka_cesty) {
                 points[i]->edges[j] = createRoute(mapa, mapOfV[points[j]->y][points[j]->x]);
                 if (points[i]->edges[j] == NULL) {
                     //ak cesta neexistuje
-                    printf("Cesta neexistuje.\n");
+                    printf("Cesta neexistuje ku princeznej.\n");
                     *dlzka_cesty = 0;
                     return NULL;
                 }
@@ -410,15 +416,18 @@ int main()
                 scanf("%s", s);
                 f=fopen(s,"r");
                 if(f)
-                    fscanf(f, "%d %d %d", &n, &m, &t);
+                    fscanf(f, "%d %d %d\n", &n, &m, &t);
                 else
                     continue;
                 mapa = (char**)malloc(n*sizeof(char*));
                 for(i=0; i<n; i++){
                     mapa[i] = (char*)malloc(m*sizeof(char));
+                    char policko;
                     for (int j=0; j<m; j++){
-                        char policko = fgetc(f);
-                        if(policko == '\n') policko = fgetc(f);
+                        fscanf(f,"%c",&policko);
+                        while ((policko != 'C') && (policko != 'D') && (policko != 'P') && (policko != 'N') && (policko != 'H')) {
+                            fscanf(f,"%c",&policko);
+                        }
                         mapa[i][j] = policko;
                     }
                 }
@@ -432,7 +441,7 @@ int main()
                 mapa = (char**)malloc(n*sizeof(char*));
                 mapa[0]="CCHCNHCCHN";
                 mapa[1]="NNCCCHHCCC";
-                mapa[2]="DNCCNNHHHC";
+                mapa[2]="DNCCNCHHHC";
                 mapa[3]="CHHHCCCCCC";
                 mapa[4]="CCCCCNHHHH";
                 mapa[5]="PCHCCCNNNN";
@@ -507,7 +516,7 @@ int main()
             free(mapa[i]);
         }
         free(mapa);
-        break;
+        //break;
     }
     return 0;
 }

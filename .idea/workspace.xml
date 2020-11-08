@@ -13,32 +13,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b034bbec-af17-4c74-ad2a-bdcbbeaf6e3b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dokumentacia.docx" beforeDir="false" afterPath="$PROJECT_DIR$/Dokumentacia.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dokumentacia.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Dokumentacia.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/a.exe" beforeDir="false" afterPath="$PROJECT_DIR$/a.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/main.c.obj" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/main.c.obj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/objects.a" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Zadanie3.dir/objects.a" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Zadanie3.exe" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Zadanie3.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/test.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup10ZiadnaCestaPrincezna.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup1Minimal.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup2JednaCiara.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup3DveCiary.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup4Velky.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup5Velky.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup6Velky.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup7Prazdny.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup8JednaP.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/vstup9ZiadnaCestaDrak.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup10ZiadnaCestaPrincezna.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup10ZiadnaCestaPrincezna.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup2JednaCiara.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup2JednaCiara.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup4Velky.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup4Velky.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup5Velky.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup5Velky.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup6Velky.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup6Velky.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup7Prazdny.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup7Prazdny.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup8JednaP.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup8JednaP.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vstup9ZiadnaCestaDrak.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vstup9ZiadnaCestaDrak.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,6 +97,8 @@
       <workItem from="1589116474842" duration="554000" />
       <workItem from="1589183793383" duration="1271000" />
       <workItem from="1589186791554" duration="151000" />
+      <workItem from="1589186953121" duration="1421000" />
+      <workItem from="1590560941040" duration="9000" />
     </task>
     <task id="LOCAL-00001" summary="hotovy dijkstra">
       <created>1587628098349</created>
@@ -170,7 +149,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588964850451</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Final 2">
+      <created>1589187019187</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1589187019187</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,7 +170,8 @@
     <MESSAGE value="Vyzera ze dobre, este otestuj" />
     <MESSAGE value="Hotovo" />
     <MESSAGE value="Final" />
-    <option name="LAST_COMMIT_MESSAGE" value="Final" />
+    <MESSAGE value="Final 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final 2" />
   </component>
   <component name="WindowStateProjectService">
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1587450215239">
@@ -195,10 +182,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="718" y="391" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1920.1040@0.0.1920.1040" timestamp="1588576476566" />
-    <state x="585" y="114" key="CommitChangelistDialog2" timestamp="1588964848604">
+    <state x="585" y="114" key="CommitChangelistDialog2" timestamp="1589187016211">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1588964848604" />
+    <state x="585" y="114" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1589187016211" />
     <state width="510" height="466" key="DebuggerActiveHint" timestamp="1588247545662">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -223,22 +210,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="229" key="GridCell.Tab.-1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587541856976" />
-    <state width="1877" height="313" key="GridCell.Tab.0.bottom" timestamp="1589117029434">
+    <state width="1877" height="184" key="GridCell.Tab.0.bottom" timestamp="1589188376509">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="313" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1589117029434" />
-    <state width="1877" height="313" key="GridCell.Tab.0.center" timestamp="1589117029434">
+    <state width="1877" height="184" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1589188376509" />
+    <state width="1877" height="184" key="GridCell.Tab.0.center" timestamp="1589188376509">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="313" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1589117029434" />
-    <state width="1877" height="313" key="GridCell.Tab.0.left" timestamp="1589117029434">
+    <state width="1877" height="184" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1589188376509" />
+    <state width="1877" height="184" key="GridCell.Tab.0.left" timestamp="1589188376509">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="313" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1589117029434" />
-    <state width="1877" height="313" key="GridCell.Tab.0.right" timestamp="1589117029434">
+    <state width="1877" height="184" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1589188376509" />
+    <state width="1877" height="184" key="GridCell.Tab.0.right" timestamp="1589188376509">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="313" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1589117029434" />
+    <state width="1877" height="184" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1589188376509" />
     <state x="1496" y="30" width="1877" height="205" key="GridCell.Tab.1.bottom" timestamp="1589012737547">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
